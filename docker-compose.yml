@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  nvua-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tabiria_nvua_engine
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PROJECT_NAME=Tabiria-Nvua Engine - GeoCongo AI
+      - DATABASE_URL=postgresql+asyncpg://nvua_user:nvua_secret_password@db:5432/nvua_db
+      - USE_GPU_IF_AVAILABLE=true
+      - DEFAULT_CUDA_DEVICE=0
+      - MODEL_CACHE_DIR=/app/cache/earth2studio
+      - SECRET_KEY=tabiria_nvua_engine_geocongo_super_secret_key_2026
+      - STATION_SECRET_KEY=vula_station_token_xxx
+    volumes:
+      - earth2studio_cache:/app/cache/earth2studio
+      - ./app:/app/app
+    depends_on:
+      db:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  db:
+    image: timescale/timescaledb-ha:pg16
+    container_name: tabiria_nvua_timescaledb
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: nvua_db
+      POSTGRES_USER: nvua_user
+      POSTGRES_PASSWORD: nvua_secret_password
+    volumes:
+      - timescaledb_data:/home/postgres/pgdata/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nvua_user -d nvua_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  earth2studio_cache:
+    name: tabiria_nvua_earth2studio_cache
+  timescaledb_data:
+    name: tabiria_nvua_timescaledb_data
