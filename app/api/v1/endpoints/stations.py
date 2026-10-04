@@ -139,3 +139,4 @@ async def list_stations(db: AsyncSession = Depends(get_db)):
         ))
 
     return summaries
+

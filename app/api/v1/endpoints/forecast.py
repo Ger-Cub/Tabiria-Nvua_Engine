@@ -48,7 +48,9 @@ async def get_point_forecast(
                 metrics = {
                     "temperature_c": last_tel.temperature_c,
                     "precipitation_mm_last_hour": last_tel.precipitation_mm_last_hour,
-                    "pressure_hpa": last_tel.pressure_hpa
+                    "pressure_hpa": last_tel.pressure_hpa,
+                    "wind_speed_ms": last_tel.wind_speed_ms,
+                    "wind_direction_deg": last_tel.wind_direction_deg
                 }
 
             station_data_list.append({

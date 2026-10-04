@@ -9,11 +9,13 @@ class StationLocation(BaseModel):
 class StationMetrics(BaseModel):
     temperature_c: Optional[confloat(ge=-50.0, le=70.0)] = Field(None, description="Température de l'air en °C")
     humidity_pct: Optional[confloat(ge=0.0, le=100.0)] = Field(None, description="Humidité relative en %")
-    pressure_hpa: Optional[confloat(ge=800.0, le=1100.0)] = Field(None, description="Pression atmosphérique en hPa")
+    pressure_hpa: Optional[confloat(ge=600.0, le=1100.0)] = Field(None, description="Pression atmosphérique en hPa (adapté relief/altitude)")
     precipitation_mm_last_hour: Optional[confloat(ge=0.0)] = Field(0.0, description="Précipitations cumulées sur la dernière heure en mm")
     precipitation_intensity_mm_h: Optional[confloat(ge=0.0)] = Field(0.0, description="Intensité des précipitations en mm/h")
     wind_speed_ms: Optional[confloat(ge=0.0, le=150.0)] = Field(None, description="Vitesse du vent en m/s")
-    wind_direction_deg: Optional[confloat(ge=0.0, le=360.0)] = Field(None, description="Direction du vent en degrés")
+    wind_direction_deg: Optional[confloat(ge=0.0, le=360.0)] = Field(None, description="Direction du vent en degrés (0-360°)")
+    wind_u10m: Optional[float] = Field(None, description="Composante zonale Ouest-Est du vent en m/s (optionnel)")
+    wind_v10m: Optional[float] = Field(None, description="Composante méridienne Sud-Nord du vent en m/s (optionnel)")
     solar_radiation_w_m2: Optional[confloat(ge=0.0, le=1500.0)] = Field(None, description="Rayonnement solaire en W/m²")
 
 class StationIngestionPayload(BaseModel):
@@ -31,7 +33,7 @@ class PointForecastRequest(BaseModel):
         description="Variables météorologiques à prédire"
     )
     forecast_horizon_hours: conint(ge=6, le=240) = Field(72, description="Horizon de prévision en heures")
-    use_local_station_correction: bool = Field(True, description="Appliquer ou non la correction par stations locales proches")
+    use_local_station_correction: bool = Field(True, description="Appliquer ou non le downscaling par les stations physiques locales")
     model_name: Optional[str] = Field(None, description="Nom du modèle Earth2Studio (ex: FourCastNet, GraphCast)")
 
 class BBoxForecastRequest(BaseModel):
